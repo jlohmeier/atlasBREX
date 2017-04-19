@@ -187,15 +187,20 @@ trap removetemp 0
         exit 1
     fi
 
-    #get FILEDIR
-    DIR=$(dirname "${standard_BE_}")
+    #warning not in common folder
     SDIR=$(dirname "$0")
+    if [[ ! $(dirname "${standard_BE_}") == $SDIR ]] || [[ ! $(dirname "${standard_nonBE_}") == $SDIR ]] || [[ ! $(dirname "${highres_nonBE_}") == $SDIR ]]
+    then
+        echo ">> All files need to be within a common folder."
+        exit
+    fi
 
+    #warning conflicting file/folder names
     tfd=(/*temp*)
     if [[ -f ${tfd[0]} ]] || [[ -d ${tfd[0]} ]]
     then
-    echo ">> Rename files or folders containing [temp] in this directory."
-    exit
+        echo ">> Rename files or folders containing [temp] in this directory."
+        exit
     fi
 
 
