@@ -15,6 +15,7 @@ Due to optimization for the human brain, most common skullstripping/brain-extrac
 - multi-step registration (2- or 3-step registration) for improved registration to low resolution spaces and robust brain-extraction for the respective downstream volumes (e.g. functional- and magnitude-volume for fMRI)
 - uses robust FSL (FLIRT, FNIRT) or ANTs (SyN) registration algorithms (optional linear and non-linear registration)
 - tested with T1-/T2-weighted volumes
+- evaluated using developmental and adult marmosets, macaques and rodents
 - no probability (tissue) mask required
 - includes various (optional) strategies for robust registration: 
   * bias field correction (N4)
@@ -48,7 +49,7 @@ sh atlasBREX.sh -b <input> -nb <input> -h <input> -f <input>
 - sj_170308_2.nii.gz (subject #2)
 - sj_170308_3.nii.gz (subject #3)
 
-Copy all gzipped (.nii.gz) NIFTI volumes and *atlasBREX.sh* into a common folder.
+Copy all gzipped (.nii.gz) NIFTI volumes and *atlasBREX.sh* into a **common** folder.
 
 1. Step: First run atlasBREX with linear registration using the `-f n` flag to determine a reasonable fractional intensity value. AtlasBREX will propose you 3 images for selection (Choose the option with least extracranial tissue) during this test-run. This step will usually take only a few minutes. In case of poor preliminary brain-extraction, registration failure or *T1-weighted images*, use the `-nrm 1` flag for intensity normalization, if you have AFNI installed. If brain regions are clipped using FLIRT/FNIRT, adjust the fractional intensity parameter to improve preliminary brain-extraction. If available, try `-reg 2` for ANTs, particularly if you encounter issues with T1-weighted images. Single-subject or averaged templates with similar contrast patterns frequently provide better results and are more 'robust'.
 
@@ -105,7 +106,7 @@ done
     -dil        dilate segmentation draft from linear registration n-times 
                 and use as baseline for non-linear registration (e.g. -dil 4)
 
-## Notes:
+## Troubleshooting and notes:
 - use `-help`/`--help` for further details.
 - see *log.txt* for a summary after running the script.
 - use `-f n` during the test-run to determine a suitable fractional intensity threshold. atlasBREX will propose 3 brain-extractions and lets you choose at the beginning of the procedure.
