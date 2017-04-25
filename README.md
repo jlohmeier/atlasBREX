@@ -4,10 +4,10 @@
 ![alt text](http://www.blog.jlohmeier.de/wp-content/uploads/2017/03/animation_34.gif "Sample")
 ###### *Developmental (24 months) T2-weighted macaque sample from UNC-Wisconsin Neurodevelopment Rhesus Database (The UNC-Wisconsin Rhesus Macaque Neurodevelopment Database: A Structural MRI and DTI Database of Early Postnatal Development)*
 
-Due to optimization for the human brain, most common skullstripping/brain-extraction methods, such as AFNI's [3dSkullStrip](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dSkullStrip.html) or FSL's [BET](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET),  yield insufficient brain-extraction results for non-human brains, which require manual intervention. Making use of the available brain-extraction from a template-/atlas-volume, this approach implements brain-extraction through reversal transformation of a template-derived mask. Both linear (FLIRT, ANTs) and non-linear (FNIRT, SyN) registration can be performed.
+Due to optimization for the human brain, most common skullstripping/brain-extraction methods, such as AFNI's [3dSkullStrip](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dSkullStrip.html) or FSL's [BET](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET),  achieve insufficient brain-extraction results for non-human brains, which require further manual intervention. Making use of the available brain-extraction from a template-/atlas-volume, this approach implements brain-extraction through reversal transformation of a template-derived mask. Both linear (FLIRT, ANTs) and non-linear (FNIRT, SyN) registration can be performed.
 
 #### _Operational sequence:_
-![alt text](http://www.blog.jlohmeier.de/wp-content/uploads/2017/03/ABX_workflow.jpg "atlasBREX workflow")
+![alt text](http://www.blog.jlohmeier.de/wp-content/uploads/2017/04/170425_workflow.jpg "atlasBREX workflow")
 
 #### Advantages (over similar approaches):
 - simple and straightforward usage (with various optional parameters for further optimization)
@@ -49,10 +49,13 @@ sh atlasBREX.sh -b <input> -nb <input> -h <input> -f <input>
 - sj_170308_2.nii.gz (subject #2)
 - sj_170308_3.nii.gz (subject #3)
 
-Copy all gzipped (.nii.gz) NIFTI volumes and *atlasBREX.sh* into a **common** folder. 
-(there should be no directories or files containing *orig* or *temp*)
+Copy all gzipped (.nii.gz) NIFTI volumes and *atlasBREX.sh* into a **common** folder. There should be no directory or file containing *'orig'*, *'temp'* or *'_.nii.gz'* in this folder.
 
-**1. Step**: Run atlasBREX with linear registration using the `-f n` flag to determine a reasonable fractional intensity value. AtlasBREX will propose you 3 images for selection (Choose the option with least extracranial tissue) during this pilot-run. This step will usually take only a few minutes. In case of poor provisional brain-extraction, registration failure or *T1-weighted images*, use the `-nrm 1` flag for intensity normalization, if you have AFNI installed. If brain regions are clipped using FLIRT/FNIRT, adjust the fractional intensity parameter or reduce the FOV using `robustfov` (FSL) to improve preliminary brain-extraction. If available, try `-reg 2` for ANTs, particularly if you encounter issues with T1-weighted images. Single-subject or averaged templates with similar contrast patterns frequently provide better results and are more 'robust'.
+**1. Step**: Run atlasBREX with linear registration using the `-f n` flag to determine a reasonable fractional intensity value. AtlasBREX will propose you 3 images for selection (Choose the option with least extracranial tissue) during this pilot-run. This step will usually take only a few minutes. 
+- use the `-nrm 1` flag for T1W intensity normalization, where AFNI is available. Improves provisional brain-extraction and registration accuracy.
+- if brain regions appear clipped using FLIRT/FNIRT, try to adjust the fractional intensity parameter or reduce the FOV using `robustfov` (FSL) to improve preliminary brain-extraction. 
+- if available, try `-reg 2` for the ANTs registration framework, particularly if you encounter issues with T1-weighted images. 
+- single-subject or **averaged templates** with similar contrast patterns frequently provide better results and are more 'robust'.
 
 ```
 sh atlasBREX.sh -b b_template_brain.nii.gz -nb nb_template.nii.gz -h sj_170308_1.nii.gz -f n
@@ -107,19 +110,18 @@ done
     -dil        dilate segmentation draft from linear registration n-times 
                 and use as baseline for non-linear registration (e.g. -dil 4)
 
-## Troubleshooting and notes:
+## Notes/Troubleshooting:
 - use `-help`/`--help` for further details.
 - see *log.txt* for a summary after running the script.
 - use `-f n` during the test-run to determine a suitable fractional intensity threshold. atlasBREX will propose 3 brain-extractions and lets you choose at the beginning of the procedure.
-- use `-nrm` flag for (interim) intensity normalization (AFNI required) for for T1- and T2-weighted images. In most cases this will yield better preliminary brain-extraction and registration results.
-- use `-dil` flag in case of registration failures during non-linear registration. Can cause errors if the parameter is not ideal. (n >= 4 as recommended starting point)
+- use `-nrm` flag for (interim) intensity normalization (AFNI required) for T1W and T2W volumes. In most cases this will yield better preliminary brain-extraction and registration results.
+- use `-dil` flag in case of registration failures during non-linear registration. (n >= 4 as recommended starting point)
 - each (non-template) input volume will be brain-extracted, appended with a "_brain.nii.gz" or "_brain_lin.nii.gz" suffix.
 - recommended settings (for accuracy): `-reg 1 -w 5,5,5`(FNIRT with membrane energy for regularization) or `-reg 2 -w 1`(SyN w/ bias field correction).
-- adjust warp resolution if you encounter issues with memory (e.g. std::bad_alloc) or (temp.) adjust voxel-size (to values similar to  human brain) using `-vox` flag.
-- no input volume should end with *_.nii.gz*, as these would be removed during the process.
+- adjust warp resolution if you encounter issues with memory (e.g. std::bad_alloc).
 - non-linear transformation matrix and warp file are preserved (to reduce total computation time for brain-extraction of multiple downstream input volumes).
 - if the result appears miswarped, review your volumes for inconsistencies regarding q- and s-form within NIFTI headers.
-- results depend on the template and its derived mask, linear/non-linear (incl. warp-resolution) registration, applied algorithms (FSL or ANTs), quality and resolution of the input volumes and 2- or 3-step registration (particularly for functional- and magnitude-volume).
+- results depend on the template and its derived mask, linear/non-linear (incl. warp-resolution) registration, applied algorithms (FSL or ANTs), quality and resolution of the input volumes and multi-step registration (particularly for functional volumes).
 - number of threads can be set within the script for ANTs' parallel computing.
 - Bash >=4 required; OSX requires an update (e.g. `brew install bash`, check your bash version afterwards `bash --version`) and call the script using `bash atlasBREX.sh`; ignore (standard_in) 1: syntax error on OSX;
 
