@@ -5,7 +5,7 @@
 #LIC: BSD-3-Clause
 #Author: Johannes Lohmeier
 #Email: johannes.lohmeier@tum.de
-#Changed: 30.03.2017 (v1.03)
+#Changed: 25.04.2017 (v1.034)
 
 
 #Number of threads for ANTs
@@ -16,7 +16,7 @@ export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS
 HELP() {
     cat <<HELP
 
-atlasBREX [ver: 1.03]
+atlasBREX [ver: 1.034]
 Author: Johannes Lohmeier (M.D.)
 --- 
 Documentation: https://github.com/jlohmeier/atlasBREX
@@ -192,15 +192,16 @@ trap removetemp 0
     if [[ ! $(dirname "${standard_BE_}") == $SDIR ]] || [[ ! $(dirname "${standard_nonBE_}") == $SDIR ]] || [[ ! $(dirname "${highres_nonBE_}") == $SDIR ]]
     then
         echo ">> All files need to be within a common folder."
-        exit
+        exit 1
     fi
 
     #warning conflicting file/folder names
-    tfd=(/*temp*)
-    if [[ -f ${tfd[0]} ]] || [[ -d ${tfd[0]} ]]
+    tfd=$(echo *temp*)
+    ofd=$(echo *orig*)
+    if [[ -f ${tfd[0]} ]] || [[ -d ${tfd[0]} ]] || [[ -f ${ofd[0]} ]] || [[ -d ${ofd[0]} ]]
     then
-        echo ">> Rename files or folders containing [temp] in this directory."
-        exit
+        echo ">> Rename files or folders containing [temp] or [orig] in this directory."
+        exit 1
     fi
 
 
@@ -829,7 +830,7 @@ thrmsg=">> Input needs to be a number (e.g. -f 0.8). Entering [n] will propose 3
 
 #start log
 echo -e "\n============" | tee -a log.txt
-echo "> atlasBREX [1.03]" | tee -a log.txt
+echo "> atlasBREX [1.034]" | tee -a log.txt
 echo -e "============\n" | tee -a log.txt
     echo ">> $(date)" | tee -a log.txt
     echo ">> PID: $$" | tee -a log.txt
@@ -1047,7 +1048,7 @@ echo -e "============\n" | tee -a log.txt
         diln+="-dilD "
     done
 
-    echo "> Creating dilated ($voxfac) brain mask" | tee -a log.txt
+    echo "> Creating dilated ($voxfac) brain templates" | tee -a log.txt
     ${FSLDIR}/bin/fslmaths $highres_BE $BTHR $diln -bin ${highres_nonBE%%.*}dil_tmp_msk.nii.gz | tee -a log.txt
     wait
     ${FSLDIR}/bin/fslmaths $highres_nonBE -nan -mul ${highres_nonBE%%.*}dil_tmp_msk.nii.gz ${highres_nonBE%%.*}brain_tmp.nii.gz | tee -a log.txt
@@ -1056,6 +1057,16 @@ echo -e "============\n" | tee -a log.txt
     wait
     ohighres_nonBE=$highres_nonBE
     highres_nonBE=${highres_nonBE%%.*}brain_tmp.nii.gz
+
+
+    cp $standard_BE ${standard_BE%%.*}tmp_dil.nii.gz
+    ${FSLDIR}/bin/fslmaths ${standard_BE%%.*}tmp_dil.nii.gz $BTHR $diln -bin ${standard_BE%%.*}dil_tmp_msk.nii.gz | tee -a log.txt
+    wait
+    ${FSLDIR}/bin/fslmaths $standard_nonBE -nan -mul ${standard_BE%%.*}dil_tmp_msk.nii.gz ${standard_BE%%.*}brain_tmp.nii.gz | tee -a log.txt
+    wait
+    ${FSLDIR}/bin/fslcpgeom $standard_nonBE ${standard_BE%%.*}brain_tmp.nii.gz
+    ostandardBE_nonBE=$standard_nonBE
+    standard_nonBE=${standard_BE%%.*}brain_tmp.nii.gz  
     fi
 
 
@@ -1125,6 +1136,7 @@ echo -e "============\n" | tee -a log.txt
         if [[ $voxfac -gt "0" ]]
         then
             highres_nonBE=$ohighres_nonBE
+            standard_nonBE=$ostandard_nonBE
         fi
 
         mv -f ${highres_nonBE%%.*}brain.nii.gz ${highres_nonBE%%.*}brain_lin.nii.gz
