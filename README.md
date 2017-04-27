@@ -4,7 +4,7 @@
 ![alt text](http://www.blog.jlohmeier.de/wp-content/uploads/2017/03/animation_34.gif "Sample")
 ###### *Developmental (24 months) T2-weighted macaque sample from UNC-Wisconsin Neurodevelopment Rhesus Database (The UNC-Wisconsin Rhesus Macaque Neurodevelopment Database: A Structural MRI and DTI Database of Early Postnatal Development)*
 
-Due to optimization for the human brain, most common skullstripping/brain-extraction methods, such as AFNI's [3dSkullStrip](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dSkullStrip.html) or FSL's [BET](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET),  achieve insufficient brain-extraction results for non-human brains, which require further manual intervention. Making use of the available brain-extraction from a template-/atlas-volume, this approach implements brain-extraction through reversal transformation of a template-derived mask. Both linear (FLIRT, ANTs) and non-linear (FNIRT, SyN) registration can be performed.
+Due to optimization for the human brain, most common skullstripping/brain-extraction methods, such as AFNI's [3dSkullStrip](https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dSkullStrip.html) or FSL's [BET](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET),  achieve insufficient results for non-human brains, which then require further manual intervention. Making use of the available brain-extraction from a template-/atlas-volume, this approach implements brain-extraction through reversal transformation of a template-derived mask. Both linear (FLIRT, ANTs) and non-linear (FNIRT, SyN) registration can be performed.
 
 #### _Operational sequence:_
 ![alt text](http://www.blog.jlohmeier.de/wp-content/uploads/2017/04/170425_workflow.jpg "atlasBREX workflow")
@@ -21,11 +21,6 @@ Due to optimization for the human brain, most common skullstripping/brain-extrac
   * bias field correction (N4)
   * intensity normalization (3dUnifize)
   * segmentation draft dilation (see below)
-
-#### _Example of segmentation draft dilation:_
-![alt text](http://www.blog.jlohmeier.de/wp-content/uploads/2017/03/segm_draft.jpg "Sementation draft dilation")
-
-*First panel (α) shows failed segmentation (see arrows) and the result after segmentation draft dilation (red overlay). Second panel (β) shows segmentation draft dilation, which was used as baseline for non-linear registration.*
 
 ## Requirements:
 - [FSL (FMRIB Software Library)](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki)
