@@ -20,7 +20,7 @@ Due to optimization for the human brain, most common skullstripping/brain-extrac
 - includes various (optional) strategies for robust registration: 
   * bias field correction (N4)
   * intensity normalization (3dUnifize)
-  * segmentation draft dilation (see below)
+  * segmentation draft dilation: introduce dilated drafts as reference and target volumes, effectively reducing extracranial tissue (in comparison to the respective whole-head volumes)
 
 ## Requirements:
 - [FSL (FMRIB Software Library)](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki)
