@@ -33,10 +33,11 @@ Due to optimization for the human brain, most common skullstripping/brain-extrac
 ## Usage:
 
 ```
-sh atlasBREX.sh -b <input> -nb <input> -h <input> -f <input>
+bash atlasBREX.sh -b <input> -nb <input> -h <input> -f <input>
+(no multi-line commands)
 ```
 
-#### Practial example:
+#### Practical example:
 
 - b_template_brain.nii.gz (brain-extracted template)
 - nb_template.nii.gz (whole-head template)
@@ -50,10 +51,10 @@ Copy all gzipped (.nii.gz) NIFTI volumes and *atlasBREX.sh* into a **common** fo
 - use the `-nrm 1` flag for T1W intensity normalization, where AFNI is available. Improves provisional brain-extraction and registration accuracy.
 - if brain regions appear clipped using FLIRT/FNIRT, try to adjust the fractional intensity parameter or reduce the FOV using `robustfov` (FSL) to improve preliminary brain-extraction. 
 - if available, try `-reg 2` for the ANTs registration framework, particularly if you encounter issues with T1-weighted images. 
-- single-subject or **averaged templates** with similar contrast patterns frequently provide better results and are more 'robust'.
+- single-subject or **averaged templates** (ABSORB: Atlas Building by Self-Organized Registration and Bundling) with similar contrast patterns frequently provide better results.
 
 ```
-sh atlasBREX.sh -b b_template_brain.nii.gz -nb nb_template.nii.gz -h sj_170308_1.nii.gz -f n
+bash atlasBREX.sh -b b_template_brain.nii.gz -nb nb_template.nii.gz -h sj_170308_1.nii.gz -f n
 ```
 
 **2. Step**: Now that a suitable fractional intensity value is known, we can run atlasBREX with non-linear registration on all subjects in an automated and unattended manner:
@@ -61,11 +62,12 @@ sh atlasBREX.sh -b b_template_brain.nii.gz -nb nb_template.nii.gz -h sj_170308_1
 ```
 for file in *'sj_'*'.nii.gz'*
   do
-    sh atlasBREX.sh -b b_template_brain.nii.gz -nb nb_template.nii.gz -h $file -reg 1 -w 5,5,5 -msk a,0,0 -f 0.2
+    bash atlasBREX.sh -b b_template_brain.nii.gz -nb nb_template.nii.gz -h $file -reg 1 -w 5,5,5 -msk a,0,0 -f 0.2
   wait
 done
 ```
 
+- Sample dataset: https://github.com/jlohmeier/atlasBREX/tree/master/demonstration
 - Example helper script: https://github.com/jlohmeier/atlasBREX/blob/master/example.sh
 - [Visual (hands-on) walkthrough w/ rhesus macaque](http://www.blog.jlohmeier.de/wp-content/uploads/2017/03/visual_walkthrough.jpg) (*public sample data from Allen Institute for Brain Science*)
 
