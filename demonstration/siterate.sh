@@ -11,7 +11,7 @@ do
 btemplate=b_avg_2024mo_brain_blur4.nii.gz
 nbtemplate=nb_avg_2024mo_blur4.nii.gz
 
-sh atlasBREX.sh -b $btemplate -nb $nbtemplate -h $file -f 0.5 -reg 1 -w 5,5,5 -msk a,0,0
+bash atlasBREX.sh -b $btemplate -nb $nbtemplate -h $file -f 0.5 -reg 1 -w 5,5,5 -msk a,0,0
 wait
 
 name=$(echo $file | cut -d "_" -f2- )
@@ -25,7 +25,7 @@ rm -f *std2high*
 
 wait 
 
-sh atlasBREX.sh -b $btemplate -nb $nbtemplate -h $file -f 0.5 -reg 2 -w 1 -msk a,0,0
+bash atlasBREX.sh -b $btemplate -nb $nbtemplate -h $file -f 0.5 -reg 2 -w 1 -msk a,0,0
 wait
 
 #remove prefix and rename
