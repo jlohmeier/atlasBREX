@@ -6,9 +6,7 @@ Usage:
 bash siterate.sh
 
 Note:
--this example requires the installation of ANTs (and FSL)
--output/results are provided in the results folder
-- *_brain_lin.nii.gz show results from linear registration, while *_brain.nii.gz demonstrate results from non-linear registration
+This example requires the installation of ANTs (and FSL)
 
 /*****************************/
 
