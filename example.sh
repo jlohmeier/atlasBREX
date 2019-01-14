@@ -15,7 +15,7 @@ nbtemplate=nb_T1_2weeks.nii.gz
 name=$(echo $file | cut -d "_" -f2- )
 
 #atlasBREX: FNIRT
-sh atlasBREX.sh -b $btemplate -nb $nbtemplate -h $file -f 0.8 -reg 1 -w 5,5,5 -msk a,0,0
+bash atlasBREX.sh -b $btemplate -nb $nbtemplate -h $file -f 0.8 -reg 1 -w 5,5,5 -msk a,0,0
 wait
 
 #remove prefix and rename
@@ -28,7 +28,7 @@ rm -f *std2high*
 wait 
 
 #atlasBREX: ANTs/SyN
-sh atlasBREX.sh -b $btemplate -nb $nbtemplate -h $file -f 0.8 -reg 2 -w 1 -msk a,0,0
+bash atlasBREX.sh -b $btemplate -nb $nbtemplate -h $file -f 0.8 -reg 2 -w 1 -msk a,0,0
 wait
 
 #remove prefix and rename
