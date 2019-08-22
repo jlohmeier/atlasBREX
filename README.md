@@ -108,6 +108,8 @@ done
 - ANTs: https://github.com/stnava/ANTs
 
 ### Open source: BSD-3-Clause
-If you use this application or part of its source code, cite *atlasBREX* with a reference to this Github page.
+If you use this application or part of its source code, please cite *atlasBREX* with a reference to this Github page.
 
-*[work in submission]*
+**atlasBREX: Automated template-derived brain extraction in animal MRI**<br/>
+Scientific Reports, volume 9, Article number: 12219 (2019)<br/>
+DOI: 10.1038/s41598-019-48489-3
