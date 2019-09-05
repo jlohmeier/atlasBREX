@@ -106,6 +106,7 @@ done
 - FSL: http://fsl.fmrib.ox.ac.uk
 - AFNI: https://afni.nimh.nih.gov/afni/
 - ANTs: https://github.com/stnava/ANTs
+- ABSORB: https://www.nitrc.org/projects/absorb
 
 ### Open source: BSD-3-Clause
 If you use this application or part of its source code, please cite *atlasBREX* with a reference to this Github page.
