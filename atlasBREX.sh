@@ -5,7 +5,7 @@
 #LIC: BSD-3-Clause
 #Author: Johannes Lohmeier
 #Email: johannes.lohmeier@charite.de
-#Changed: 06.12.2018 (v1.1)
+#Changed: 05.03.2020 (v1.2)
 
 
 #Number of threads for ANTs
@@ -16,7 +16,7 @@ export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS
 HELP() {
     cat <<HELP
 
-atlasBREX [ver: 1.1]
+atlasBREX [ver: 1.2]
 --- 
 Documentation: https://github.com/jlohmeier/atlasBREX
 Requirement: FSL ≥ 5 (optional usage of AFNI and ANTs)
@@ -827,7 +827,7 @@ thrmsg=">> Input needs to be a number (e.g. -f 0.8). Entering [n] will propose 3
 
 #start log
 echo -e "\n============" | tee -a log.txt
-echo "> atlasBREX [1.1]" | tee -a log.txt
+echo "> atlasBREX [1.2]" | tee -a log.txt
 echo -e "============\n" | tee -a log.txt
     echo ">> $(date)" | tee -a log.txt
     echo ">> PID: $$" | tee -a log.txt
@@ -1094,7 +1094,7 @@ echo -e "============\n" | tee -a log.txt
                "1")
                #ANTs
                     echo '> SyN non-linear 1-step registration of standard -> highres' | tee -a log.txt
-                    bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -t b -f $highres_nonBE -m $standard_nonBE -o std2high_ | tee -a log.txt
+                    bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -t b -f $highres_nonBE -m $standard_nonBE -i std2high.mat -o std2high_ | tee -a log.txt
                     mv -f std2high_1Warp.nii.gz std2high_warp_${highres_BE%%.*}.nii.gz
                     mv -f std2high_0GenericAffine.mat std2high_warp_${highres_BE%%.*}.mat
                     find . -maxdepth 1 -name "*InverseWarp*" -delete
