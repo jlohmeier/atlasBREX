@@ -13,11 +13,18 @@ Due to optimization for the human brain, most common skullstripping/brain-extrac
 
 ## Requirements:
 - [FSL (FMRIB Software Library)](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki)
-- Bash >= 4
+- Bash >= 4 (echo $SHELL)
 
 *Optional:*
 - [AFNI (Analysis of Functional NeuroImages)](https://afni.nimh.nih.gov/afni/): 3dAutomask, 3dUnifize
 - [ANTs (Advanced Normalization Tools)](https://github.com/stnava/ANTs): antsRegistration, antsApplyTransforms, N4BiasFieldCorrection, ImageMath and antsRegistrationSyN
+
+Last tested with ANTs v2.3.1, AFNI_20.0.18 ('Galba') and FSL v6.0.3.
+
+## Last changes:
+v1.2 - SyN makes use of an initial transform.
+
+v1.1 - Fixed an error regarding the NIFTI header.
 
 ## Usage:
 
@@ -94,7 +101,7 @@ done
 - use `-help`/`--help` for further details.
 - see *log.txt* for a summary after running the script.
 - use `-f n` during the test-run to determine a suitable fractional intensity threshold. atlasBREX will propose 3 brain-extractions and lets you choose at the beginning of the procedure.
-- use `-nrm` flag for intensity normalization (AFNI required) for T1w volumes.
+- use `-nrm` flag for intensity normalization (AFNI required) for low-resolution volumes (both T2w and T1w) and (useful for) T1w scans.
 - use `-dil` flag in case of registration failures during non-linear registration. (n >= 4 as recommended starting point)
 - each (non-template) input volume will be brain-extracted, appended with a "_brain.nii.gz" or "_brain_lin.nii.gz" suffix.
 - adjust warp-resolution if you encounter issues with memory (e.g. std::bad_alloc).
