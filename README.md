@@ -22,6 +22,8 @@ Due to optimization for the human brain, most common skullstripping/brain-extrac
 Last tested with ANTs v2.3.1, AFNI_20.0.18 ('Galba') and FSL v6.0.3.
 
 ## Last changes:
+v1.3 - non-linear registration between skullstripped template and target volume for low-resolution volumes.
+
 v1.2 - SyN makes use of an initial transform.
 
 v1.1 - Fixed an error regarding the NIFTI header.
@@ -86,14 +88,17 @@ done
     -w/-wrp     define FNIRT (FSL) warp-resolution (e.g. -wrp 10,10,10),
                 for SyN (ANTs) enter warp [-wrp 1] flag (e.g. -wrp 1 -reg 2)
     -r/-reg     FNIRT w/ bending- [-reg 0] or membrane-energy regularization [-reg 1] 
-                ANTs/SyN w/ [-reg 2] or w/o [-reg 3] additional N4BiasFieldCorrection (def: 1) 
+                ANTs/SyN w/ [-reg 2] or w/o [-reg 3] additional N4BiasFieldCorrection (def: 1)
+    -nrm        provisional intensity normalization w/ T1 [-nrm 1] or T2 [-nrm 2] (req: AFNI)
+                (recommended for low-resolution volumes)
+    -lr         non-linear registration between skullstripped template and target volume
+                (recommended for low-resolution volumes)
     -msk        mask binarization threshold (in %) for fslmaths 
                 w/ optional erosion and dilation (e.g. -msk b,10,0,0) (def: b,0.5,0,0)
                 [-msk b,[100 < n > 0] for threshold, [0-9] for n-times erosion,
                 [0-9] for n-times dilation] or 3dAutomask (e.g. -msk a,0,0, req: AFNI) 
                 [-msk a,[0-9] for n-times erosion,[0-9] for n-times dilation]
     -vox        provisional voxel-size adjustment [-vox 1] (def: 0)
-    -nrm        provisional intensity normalization w/ T1 [-nrm 1] or T2 [-nrm 2] (req: AFNI)
     -dil        n-times dilation of the brain-extraction from linear registration 
                 prior to non-linear registration (e.g. -dil 4)
 
