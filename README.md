@@ -19,10 +19,10 @@ Due to optimization for the human brain, most common skullstripping/brain-extrac
 - [AFNI (Analysis of Functional NeuroImages)](https://afni.nimh.nih.gov/afni/): 3dAutomask, 3dUnifize
 - [ANTs (Advanced Normalization Tools)](https://github.com/stnava/ANTs): antsRegistration, antsApplyTransforms, N4BiasFieldCorrection, ImageMath and antsRegistrationSyN
 
-Last tested with ANTs v2.3.1, AFNI_20.0.18 ('Galba') and FSL v6.0.3.
+Last tested with ANTs v2.3.4, AFNI_20.0.18 ('Galba') and FSL v6.0.3.
 
 ## Last changes:
-v1.3 - non-linear registration between skullstripped template and target volume for low-resolution volumes.
+v1.5 - non-linear registration between skullstripped template and target volume for low-resolution volumes.
 
 v1.2 - SyN makes use of an initial transform.
 
@@ -91,8 +91,9 @@ done
                 ANTs/SyN w/ [-reg 2] or w/o [-reg 3] additional N4BiasFieldCorrection (def: 1)
     -nrm        provisional intensity normalization w/ T1 [-nrm 1] or T2 [-nrm 2] (req: AFNI)
                 (recommended for low-resolution volumes)
-    -lr         non-linear registration between skullstripped template and target volume
-                (recommended for low-resolution volumes)
+    -lr         optimized parameter settings for low-resolution volumes:
+                [1] non-linear registration between whole-head template and target volume with mask
+                [2] non-linear registration based on skullstripped template and target volume (def: 0)
     -msk        mask binarization threshold (in %) for fslmaths 
                 w/ optional erosion and dilation (e.g. -msk b,10,0,0) (def: b,0.5,0,0)
                 [-msk b,[100 < n > 0] for threshold, [0-9] for n-times erosion,
@@ -113,6 +114,7 @@ done
 - non-linear transformation matrix and warp file are preserved (to reduce total computation time for brain-extraction of multiple downstream input volumes).
 - if result appears miswarped, review your volumes for inconsistencies regarding q- and s-form within NIFTI headers.
 - number of threads can be set within the script for parallel computing (ANTS).
+- make sure you're using Git LFS when downloading the sample files: https://developer.lsst.io/git/git-lfs.html
 
 ### Links:
 - FSL: http://fsl.fmrib.ox.ac.uk
