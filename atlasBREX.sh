@@ -5,18 +5,20 @@
 #LIC: BSD-3-Clause
 #Author: Johannes Lohmeier
 #Email: johannes.lohmeier@charite.de
-#Changed: 10.03.2020 (v1.3)
+#Changed: 31.10.2020 (v1.5)
 
 
 #Number of threads for ANTs
-ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=32
+#set number of threads: ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=32
+#NPROCESSORS_ONLN on FreeBSD/PC-BSD
+ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$(/bin/sh -c 'getconf _NPROCESSORS_ONLN')
  # controls multi-threading
 export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS
 
 HELP() {
     cat <<HELP
 
-atlasBREX [ver: 1.3]
+atlasBREX [ver: 1.5]
 --- 
 Documentation: https://github.com/jlohmeier/atlasBREX
 Requirement: FSL ≥ 5 (optional usage of AFNI and ANTs)
@@ -47,8 +49,9 @@ Optional arguments:
                 ANTs/SyN w/ [-reg 2] or w/o [-reg 3] additional N4BiasFieldCorrection (def: 1)
     -nrm        provisional intensity normalization w/ T1 [-nrm 1] or T2 [-nrm 2] (req: AFNI)
                 (recommended for low-resolution volumes)
-    -lr         non-linear registration between skullstripped template and target volume
-                (recommended for low-resolution volumes)
+    -lr         optimized parameter settings for low-resolution volumes:
+                [1] non-linear registration between whole-head template and target volume with mask
+                [2] non-linear registration based on skullstripped template and target volume (def: 0)
     -msk        mask binarization threshold (in %) for fslmaths 
                 w/ optional erosion and dilation (e.g. -msk b,10,0,0) (def: b,0.5,0,0)
                 [-msk b,[100 < n > 0] for threshold, [0-9] for n-times erosion,
@@ -326,18 +329,6 @@ trap removetemp 0
         fi
     fi
 
-    #set flag for low-res mode
-    LOWRES=0
-    if [[ -n "${LOWRES_}" ]]
-    then
-        if [[ ${LOWRES_} -eq "0" ]] || [[ ${LOWRES_} -eq "1" ]]
-        then
-        LOWRES=${LOWRES_}
-        else
-            echo '>> Input needs to be either [1] or [0] (default: 0). See -help'
-            exit 1
-        fi
-    fi
 
     #set flag for rotation to common orientation
     REORIENT=0
@@ -461,6 +452,30 @@ thrmsg=">> Input needs to be a number (e.g. -f 0.8). Entering [n] will propose 3
     else
         echo $thrmsg
         exit 1
+    fi
+
+    #set flag for low-res mode
+    LOWRES=0
+    if [[ -n "${LOWRES_}" ]] && [[ $LIN -eq "0" ]]
+    then
+        if [[ ${LOWRES_} -eq "0" ]] || [[ ${LOWRES_} -eq "1" ]] || [[ ${LOWRES_} -eq "2" ]]
+        then
+
+
+
+    if [[ ${LOWRES_} -eq "1" ]]
+    then
+    LOWRES=1
+    fi
+
+    if [[ ${LOWRES_} -eq "2" ]]
+    then
+    LOWRES=2
+    fi
+        else
+            echo '>> Input needs to be either [1] or [2] (default: 0). See -help'
+            exit 1
+        fi
     fi
 
     #prep endregion
@@ -846,7 +861,7 @@ thrmsg=">> Input needs to be a number (e.g. -f 0.8). Entering [n] will propose 3
 
 #start log
 echo -e "\n============" | tee -a log.txt
-echo "> atlasBREX [1.3]" | tee -a log.txt
+echo "> atlasBREX [1.5]" | tee -a log.txt
 echo -e "============\n" | tee -a log.txt
     echo ">> $(date)" | tee -a log.txt
     echo ">> PID: $$" | tee -a log.txt
@@ -1028,7 +1043,7 @@ echo -e "============\n" | tee -a log.txt
        "1")
        #ANTs
             echo '> ANTs linear registration of standard -> highres' | tee -a log.txt
-            bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -t a -f $highres_BE -m $standard_BE -o std2high | tee -a log.txt
+            bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -t a -f $highres_BE -m $standard_BE -o std2high -j 0 | tee -a log.txt
             mv -f std2high0GenericAffine.mat std2high.mat
             find . -maxdepth 1 -name "*Warped*" -delete
         ;;
@@ -1110,34 +1125,58 @@ echo -e "============\n" | tee -a log.txt
                     --ref=$highres_nonBE --warpres=${WARP} --regmod=$REGM --intmod=global_non_linear_with_bias \
                     --intorder=5 --biasres=50,50,50 --refmask=${highres_BE%%.*}_temp_mask.nii.gz --miter=5,5,5,5,5,10 \
                     --subsamp=4,4,2,2,1,1 --applyinmask=0 --applyrefmask=0,0,0,0,1,1 --lambda=300,150,100,50,40,30 \
-                    --infwhm=8,6,5,4,2,0 --reffwhm=8,6,5,4,2,0 --estint=1,1,1,1,1,0 --numprec=float --numprec=float --verbose --splineorder=3 | tee -a log.txt
-                    else
+                    --infwhm=8,6,5,4,2,0 --reffwhm=8,6,5,4,2,0 --estint=1,1,1,1,1,0 --numprec=float --verbose --splineorder=3 | tee -a log.txt
+                    fi
+                    if [[ $LOWRES -eq "1" ]]
+                    then
+                    echo '> FNIRT non-linear 1-step registration: skullstripped standard -> highres with --warpres='${WARP} 'and --regmod='${REGM} | tee -a log.txt
+                    ${FSLDIR}/bin/fnirt --in=$standard_BE --aff=std2high.mat --cout=std2high_warp_${highres_BE%%.*} \
+                    --ref=$highres_nonBE --warpres=${WARP} --regmod=$REGM --intmod=global_non_linear_with_bias \
+                    --intorder=5 --biasres=50,50,50 --refmask=${highres_BE%%.*}_temp_mask.nii.gz --miter=5,5,5,5,5,10 \
+                    --subsamp=4,4,2,2,1,1 --applyinmask=0 --applyrefmask=0,0,0,0,1,1 --lambda=300,150,100,50,40,30 \
+                    --infwhm=8,6,5,4,2,0 --reffwhm=8,6,5,4,2,0 --estint=1,1,1,1,1,0 --numprec=float --verbose --splineorder=3 | tee -a log.txt
+                    fi
+                    if [[ $LOWRES -eq "2" ]]
+                    then
                     echo '> FNIRT non-linear 1-step registration: skullstripped standard -> skullstripped highres with --warpres='${WARP} 'and --regmod='${REGM} | tee -a log.txt
                     ${FSLDIR}/bin/fnirt --in=$standard_BE --aff=std2high.mat --cout=std2high_warp_${highres_BE%%.*} \
                     --ref=$highres_BE --warpres=${WARP} --regmod=$REGM --intmod=global_non_linear_with_bias \
                     --intorder=5 --biasres=50,50,50 --refmask=${highres_BE%%.*}_temp_mask.nii.gz --miter=5,5,5,5,5,10 \
                     --subsamp=4,4,2,2,1,1 --applyinmask=0 --applyrefmask=0,0,0,0,1,1 --lambda=300,150,100,50,40,30 \
-                    --infwhm=8,6,5,4,2,0 --reffwhm=8,6,5,4,2,0 --estint=1,1,1,1,1,0 --numprec=float --numprec=float --verbose --splineorder=3 | tee -a log.txt
-                    fi                    
+                    --infwhm=8,6,5,4,2,0 --reffwhm=8,6,5,4,2,0 --estint=1,1,1,1,1,0 --numprec=float --verbose --splineorder=3 | tee -a log.txt
+                    fi               
                 ;;
                "1")
                #ANTs
                     if [[ $LOWRES -eq "0" ]]
                     then
                     echo '> SyN non-linear 1-step registration of standard -> highres' | tee -a log.txt
-                    bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -f $highres_nonBE -m $standard_nonBE -i std2high.mat -j 1 -o std2high_ | tee -a log.txt
+                    bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -f $highres_nonBE -m $standard_nonBE -i std2high.mat -j 0 -o std2high_ | tee -a log.txt
                     mv -f std2high_1Warp.nii.gz std2high_warp_${highres_BE%%.*}.nii.gz
                     mv -f std2high_0GenericAffine.mat std2high_warp_${highres_BE%%.*}.mat
                     find . -maxdepth 1 -name "*InverseWarp*" -delete
                     find . -maxdepth 1 -name "*Warped*" -delete
-                    else
+                    fi
+                    if [[ $LOWRES -eq "1" ]]
+                    then
+                    ${FSLDIR}/bin/fslmaths $highres_BE $BTHR -dilD -bin ${highres_BE%%.*}_temp_mask.nii.gz | tee -a log.txt
+                    ${FSLDIR}/bin/fslcpgeom $highres_nonBE ${highres_BE%%.*}_temp_mask.nii.gz
+                    echo '> SyN non-linear 1-step registration of standard ->  highres with mask' | tee -a log.txt
+                    bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -x ${highres_BE%%.*}_temp_mask.nii.gz -f $highres_nonBE -m $standard_nonBE -i std2high.mat -j 0 -o std2high_ | tee -a log.txt
+                    mv -f std2high_1Warp.nii.gz std2high_warp_${highres_BE%%.*}.nii.gz
+                    mv -f std2high_0GenericAffine.mat std2high_warp_${highres_BE%%.*}.mat
+                    find . -maxdepth 1 -name "*InverseWarp*" -delete
+                    find . -maxdepth 1 -name "*Warped*" -delete
+                    fi
+                    if [[ $LOWRES -eq "2" ]]
+                    then
                     echo '> SyN non-linear 1-step registration of skullstripped standard -> skullstripped highres' | tee -a log.txt
-                    bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -f $highres_BE -m $standard_BE -i std2high.mat -j 1 -o std2high_ | tee -a log.txt
+                    bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -f $highres_BE -m $standard_BE -i std2high.mat -j 0 -o std2high_ | tee -a log.txt
                     mv -f std2high_1Warp.nii.gz std2high_warp_${highres_BE%%.*}.nii.gz
                     mv -f std2high_0GenericAffine.mat std2high_warp_${highres_BE%%.*}.mat
                     find . -maxdepth 1 -name "*InverseWarp*" -delete
                     find . -maxdepth 1 -name "*Warped*" -delete
-                    fi                        
+                    fi                     
                 ;;
             esac
         else
@@ -1150,20 +1189,32 @@ echo -e "============\n" | tee -a log.txt
             if [[ $LOWRES -eq "0" ]]
             then
             echo "> SyN non-linear 1-step registration of standard -> highres" | tee -a log.txt
-            bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -f $highres_nonBE -m $standard_nonBE -i std2high.mat -j 1 -o std2high_ | tee -a log.txt
+            bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -f $highres_nonBE -m $standard_nonBE -i std2high.mat -j 0 -o std2high_ | tee -a log.txt
             mv -f std2high_1Warp.nii.gz std2high_warp_${highres_BE%%.*}.nii.gz
             mv -f std2high_0GenericAffine.mat std2high_warp_${highres_BE%%.*}.mat
             find . -maxdepth 1 -name "*InverseWarp*" -delete
             find . -maxdepth 1 -name "*Warped*" -delete
-            else
-            echo "> SyN non-linear 1-step registration of skullstripped standard -> skullstripped highres" | tee -a log.txt
-            bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -f $highres_BE -m $standard_BE -i std2high.mat -j 1 -o std2high_ | tee -a log.txt
+            fi
+            if [[ $LOWRES -eq "1" ]]
+            then
+            ${FSLDIR}/bin/fslmaths $highres_BE $BTHR -dilD -bin ${highres_BE%%.*}_temp_mask.nii.gz | tee -a log.txt
+            ${FSLDIR}/bin/fslcpgeom $highres_nonBE ${highres_BE%%.*}_temp_mask.nii.gz
+            echo "> SyN non-linear 1-step registration of standard -> highres with mask" | tee -a log.txt
+            bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -x ${highres_BE%%.*}_temp_mask.nii.gz -f $highres_nonBE -m $standard_nonBE -i std2high.mat -j 0 -o std2high_ | tee -a log.txt
             mv -f std2high_1Warp.nii.gz std2high_warp_${highres_BE%%.*}.nii.gz
             mv -f std2high_0GenericAffine.mat std2high_warp_${highres_BE%%.*}.mat
             find . -maxdepth 1 -name "*InverseWarp*" -delete
             find . -maxdepth 1 -name "*Warped*" -delete
             fi            
-
+            if [[ $LOWRES -eq "2" ]]
+            then
+             echo '> SyN non-linear 1-step registration of skullstripped standard -> skullstripped highres' | tee -a log.txt
+            bash antsRegistrationSyN.sh -d 3 -n $ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS -p f -t b -f $highres_BE -m $standard_BE -i std2high.mat -j 0 -o std2high_ | tee -a log.txt
+            mv -f std2high_1Warp.nii.gz std2high_warp_${highres_BE%%.*}.nii.gz
+            mv -f std2high_0GenericAffine.mat std2high_warp_${highres_BE%%.*}.mat
+            find . -maxdepth 1 -name "*InverseWarp*" -delete
+            find . -maxdepth 1 -name "*Warped*" -delete
+            fi  
         fi
         fi
 
