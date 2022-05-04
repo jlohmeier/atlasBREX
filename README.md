@@ -128,3 +128,20 @@ If you use this application or part of its source code, please cite *atlasBREX* 
 **atlasBREX: Automated template-derived brain extraction in animal MRI**<br/>
 Scientific Reports, volume 9, Article number: 12219 (2019)<br/>
 DOI: 10.1038/s41598-019-48489-3
+
+**Selected preclinical studies that have used atlasBREX:**
+
+2022:<br/>
+Lohmeier, J., Silva, R., Tietze, A. et al. Fibrin-targeting molecular MRI in inflammatory CNS disorders. Eur J Nucl Med Mol Imaging (2022). 
+DOI: 10.1007/s00259-022-05807-8
+
+2021:<br/>
+Adam Messinger, Nikoloz Sirmpilatze, Katja Heuer, Kep Kee Loh, Rogier Mars, et al.. A collaborative resource platform for non-human primate neuroimaging. NeuroImage, Elsevier, 2021, 226, pp.117519.
+DOI: 10.1016/j.neuroimage.2020.117519.hal-03167240
+
+Ren, B.X., Huen, I., Wu, Z.J. et al. Early postnatal irradiation‐induced age‐dependent changes in adult mouse brain: MRI based characterization. BMC Neurosci 22, 28 (2021).
+DOI: 10.1186/s12868-021-00635-2
+
+Pamela Garcia-Saldivar, Arun Garimella, Eduardo A. Garza-Villarreal, Felipe A. Mendez, Luis Concha, Hugo Merchant,
+PREEMACS: Pipeline for preprocessing and extraction of the macaque brain surface, NeuroImage, Volume 227, 2021, 117671, ISSN 1053-8119.
+DOI: 10.1016/j.neuroimage.2020.117671
