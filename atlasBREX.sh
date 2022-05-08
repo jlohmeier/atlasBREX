@@ -5,7 +5,7 @@
 #LIC: BSD-3-Clause
 #Author: Johannes Lohmeier
 #Email: johannes.lohmeier@charite.de
-#Changed: 31.10.2020 (v1.5)
+#Changed: 04.05.2022 (v1.5)
 
 
 #Number of threads for ANTs
@@ -14,6 +14,7 @@
 ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$(/bin/sh -c 'getconf _NPROCESSORS_ONLN')
  # controls multi-threading
 export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS
+export LC_NUMERIC=C
 
 HELP() {
     cat <<HELP
