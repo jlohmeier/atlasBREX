@@ -134,15 +134,17 @@ https://macatools.github.io/macapype/generated/macapype.nodes.extract_brain.Atla
 
 **Selected preclinical studies that have used atlasBREX:**
 
-Lohmeier, J., Silva, R., Tietze, A. et al. Fibrin-targeting molecular MRI in inflammatory CNS disorders. Eur J Nucl Med Mol Imaging (2022). 
+Lohmeier, J., Silva, R., Tietze, A., et al. Fibrin-targeting molecular MRI in inflammatory CNS disorders. Eur J Nucl Med Mol Imaging (2022). 
 DOI: 10.1007/s00259-022-05807-8
 
-Adam Messinger, Nikoloz Sirmpilatze, Katja Heuer, Kep Kee Loh, Rogier Mars, et al.. A collaborative resource platform for non-human primate neuroimaging. NeuroImage, Elsevier, 2021, 226, pp.117519.
+Messinger, A., Sirmpilatze, N., Heuer, K. et al. A collaborative resource platform for non-human primate neuroimaging. NeuroImage, Elsevier, 2021, 226, pp.117519.
 DOI: 10.1016/j.neuroimage.2020.117519.hal-03167240
+
+Garcia-Saldivar, P., Garimella, A., Garza-Villarreal, EA et al. PREEMACS: Pipeline for preprocessing and extraction of the macaque brain surface, NeuroImage, Volume 227, 2021, 117671, ISSN 1053-8119.
+DOI: 10.1016/j.neuroimage.2020.117671
+
+Puthillathu, N., Moffett, JR, Korotcov, A. et al. A Brief Isoflurane Administration as an Adjunct Treatment to Control Organophosphate-Induced Convulsions and Neuropathology. Frontiers in Pharmacology. 
+DOI: 10.3389/fphar.2023.1293280/full
 
 Ren, B.X., Huen, I., Wu, Z.J. et al. Early postnatal irradiation‐induced age‐dependent changes in adult mouse brain: MRI based characterization. BMC Neurosci 22, 28 (2021).
 DOI: 10.1186/s12868-021-00635-2
-
-Pamela Garcia-Saldivar, Arun Garimella, Eduardo A. Garza-Villarreal, Felipe A. Mendez, Luis Concha, Hugo Merchant,
-PREEMACS: Pipeline for preprocessing and extraction of the macaque brain surface, NeuroImage, Volume 227, 2021, 117671, ISSN 1053-8119.
-DOI: 10.1016/j.neuroimage.2020.117671
